@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-cn"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="origin">
+<title>FastJson对于JSON格式字符串、JSON对象及JavaBean之间的相互转换 - 你是风儿 - 博客园</title>
+<meta property="og:description" content="fastJson对于json格式字符串的解析主要用到了一下三个类： JSON：fastJson的解析器，用于JSON格式字符串与JSON对象及javaBean之间的转换。 JSONObject：fas">
+<link type="text/css" rel="stylesheet" href="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/blog-common.css">
+<link id="MainCss" type="text/css" rel="stylesheet" href="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/bundle-darkgreentrip.css">
+<link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/bundle-darkgreentrip-mobile.css">
+<link title="RSS" type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/cdf-opensource-007/rss">
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/cdf-opensource-007/rsd.xml">
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/cdf-opensource-007/wlwmanifest.xml">
+<script async="" src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/analytics.js"></script><script type="text/javascript" src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/encoder.js"></script><script src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/jquery-2.js"></script>
+<script type="text/javascript">var currentBlogApp = 'cdf-opensource-007', cb_enable_mathjax=true;var isLogined=false;</script>
+<script type="text/x-mathjax-config;executed=true">
+    MathJax.Hub.Config({
+        tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']], processClass: 'blogpost-body', processEscapes: true },
+        TeX: { 
+            equationNumbers: { autoNumber: ['AMS'], useLabelIds: true }, extensions: ['extpfeil.js'] },
+            'HTML-CSS': { linebreaks: { automatic: true } },
+            SVG: { linebreaks: { automatic: true } }
+        });
+    </script><script src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/MathJax.js"></script>
+<script src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/blog-common.js" type="text/javascript"></script>
+<style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 1px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: .7em}
+.MathJax_MenuRadioCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: #606872; color: white}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1px; bottom: 2px; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style><link rel="preload" href="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/integrator.js" as="script"><script type="text/javascript" src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/integrator.js"></script><script src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/pubads_impl_263.js" async=""></script></head>
+<body><div id="MathJax_Message" style="display: none;"></div>
+<a name="top"></a>
+
+<!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+	<a id="lnkBlogLogo" href="https://www.cnblogs.com/cdf-opensource-007/"><img id="blogLogo" src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/logo.gif" alt="返回主页"></a>			
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle" href="https://www.cnblogs.com/cdf-opensource-007/">你是风儿</a></h1>
+<h2></h2>
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">博客园</a></li>
+<li><a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/cdf-opensource-007/">首页</a></li>
+<li><a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a></li>
+<li><a id="blog_nav_contact" class="menu" rel="nofollow" href="https://msg.cnblogs.com/send/%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF">联系</a></li>
+<li><a id="blog_nav_rss" class="menu" href="https://www.cnblogs.com/cdf-opensource-007/rss">订阅</a>
+<!--<a id="blog_nav_rss_image" class="aHeaderXML" href="https://www.cnblogs.com/cdf-opensource-007/rss"><img src="//www.cnblogs.com/images/xml.gif" alt="订阅" /></a>--></li>
+<li><a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a></li>
+</ul>
+		<div class="blogStats">
+			
+			<div id="blog_stats">
+<span id="stats_post_count">随笔 - 29&nbsp; </span>
+<span id="stats_article_count">文章 - 0&nbsp; </span>
+<span id="stats-comment_count">评论 - 16</span>
+</div>
+			
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		
+<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class="post">
+		<h1 class="postTitle">
+			<a id="cb_post_title_url" class="postTitle2" href="https://www.cnblogs.com/cdf-opensource-007/p/7106018.html">FastJson对于JSON格式字符串、JSON对象及JavaBean之间的相互转换</a>
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			<div id="cnblogs_post_body" class="blogpost-body"><p>fastJson对于json格式字符串的解析主要用到了一下三个类：</p>
+<p>JSON：fastJson的解析器，用于JSON格式字符串与JSON对象及javaBean之间的转换。</p>
+<p>JSONObject：fastJson提供的json对象。</p>
+<p>JSONArray：fastJson提供json数组对象。</p>
+<p>我们可以把JSONObject当成一个Map&lt;String,Object&gt;来看，只是JSONObject提供了更为丰富便捷的方法，方便我们对于对象属性的操作。我们看一下源码。</p>
+<p><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/1014108-20170702123831164-204043901.png" alt=""></p>
+<p>同样我们可以把JSONArray当做一个List&lt;Object&gt;，可以把JSONArray看成JSONObject对象的一个集合。</p>
+<p><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/1014108-20170702124211524-639489808.png" alt=""></p>
+<p>此外，由于JSONObject和JSONArray继承了JSON，所以说也可以直接使用两者对JSON格式字符串与JSON对象及javaBean之间做转换，不过为了避免混淆我们还是使用JSON。</p>
+<p>&nbsp;</p>
+<p>首先定义三个json格式的字符串，作为我们的数据源。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #008000">//</span><span style="color: #008000">json字符串-简单对象型</span>
+<span style="color: #0000ff">private</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">final</span> String  JSON_OBJ_STR = "{\"studentName\":\"lily\",\"studentAge\":12}"<span style="color: #000000">;
+</span><span style="color: #008000">//</span><span style="color: #008000">json字符串-数组类型</span>
+<span style="color: #0000ff">private</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">final</span> String  JSON_ARRAY_STR = "[{\"studentName\":\"lily\",\"studentAge\":12},{\"studentName\":\"lucy\",\"studentAge\":15}]"<span style="color: #000000">;
+</span><span style="color: #008000">//</span><span style="color: #008000">复杂格式json字符串</span>
+<span style="color: #0000ff">private</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">final</span> String  COMPLEX_JSON_STR = "{\"teacherName\":\"crystall\",\"teacherAge\":27,\"course\":{\"courseName\":\"english\",\"code\":1270},\"students\":[{\"studentName\":\"lily\",\"studentAge\":12},{\"studentName\":\"lucy\",\"studentAge\":15}]}";</pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<p><strong><span style="font-size: 15px">示例1：JSON格式字符串与JSON对象之间的转换。</span></strong></p>
+<p>示例1.1-json字符串-简单对象型与JSONObject之间的转换</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #008000">    /**</span><span style="color: #008000">
+     * json字符串-简单对象型与JSONObject之间的转换
+     </span><span style="color: #008000">*/</span>
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span><span style="color: #000000"> testJSONStrToJSONObject(){
+
+        JSONObject jsonObject </span>=<span style="color: #000000"> JSON.parseObject(JSON_OBJ_STR);
+        </span><span style="color: #008000">//</span><span style="color: #008000">JSONObject jsonObject1 = JSONObject.parseObject(JSON_OBJ_STR); </span><span style="color: #008000">//</span><span style="color: #008000">因为JSONObject继承了JSON，所以这样也是可以的</span>
+<span style="color: #000000">
+        System.out.println(jsonObject.getString(</span>"studentName")+":"+jsonObject.getInteger("studentAge"<span style="color: #000000">));
+
+    }</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<p>示例1.2-json字符串-数组类型与JSONArray之间的转换</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #008000">    /**</span><span style="color: #008000">
+     * json字符串-数组类型与JSONArray之间的转换
+     </span><span style="color: #008000">*/</span>
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span><span style="color: #000000"> testJSONStrToJSONArray(){
+
+        JSONArray jsonArray </span>=<span style="color: #000000"> JSON.parseArray(JSON_ARRAY_STR);
+        </span><span style="color: #008000">//</span><span style="color: #008000">JSONArray jsonArray1 = JSONArray.parseArray(JSON_ARRAY_STR);</span><span style="color: #008000">//</span><span style="color: #008000">因为JSONArray继承了JSON，所以这样也是可以的
+
+        </span><span style="color: #008000">//</span><span style="color: #008000">遍历方式1</span>
+        <span style="color: #0000ff">int</span> size =<span style="color: #000000"> jsonArray.size();
+        </span><span style="color: #0000ff">for</span> (<span style="color: #0000ff">int</span> i = 0; i &lt; size; i++<span style="color: #000000">){
+            JSONObject jsonObject </span>=<span style="color: #000000"> jsonArray.getJSONObject(i);
+            System.out.println(jsonObject.getString(</span>"studentName")+":"+jsonObject.getInteger("studentAge"<span style="color: #000000">));
+        }
+
+        </span><span style="color: #008000">//</span><span style="color: #008000">遍历方式2</span>
+        <span style="color: #0000ff">for</span><span style="color: #000000"> (Object obj : jsonArray) {
+            JSONObject jsonObject </span>=<span style="color: #000000"> (JSONObject) obj;
+            System.out.println(jsonObject.getString(</span>"studentName")+":"+jsonObject.getInteger("studentAge"<span style="color: #000000">));
+        }
+    }</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<p>示例1.3-复杂json格式字符串与JSONObject之间的转换</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #008000">    /**</span><span style="color: #008000">
+     * 复杂json格式字符串与JSONObject之间的转换
+     </span><span style="color: #008000">*/</span>
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span><span style="color: #000000"> testComplexJSONStrToJSONObject(){
+
+        JSONObject jsonObject </span>=<span style="color: #000000"> JSON.parseObject(COMPLEX_JSON_STR);
+        </span><span style="color: #008000">//</span><span style="color: #008000">JSONObject jsonObject1 = JSONObject.parseObject(COMPLEX_JSON_STR);</span><span style="color: #008000">//</span><span style="color: #008000">因为JSONObject继承了JSON，所以这样也是可以的</span>
+<span style="color: #000000">        
+        String teacherName </span>= jsonObject.getString("teacherName"<span style="color: #000000">);
+        Integer teacherAge </span>= jsonObject.getInteger("teacherAge"<span style="color: #000000">);
+        JSONObject course </span>= jsonObject.getJSONObject("course"<span style="color: #000000">);
+        JSONArray students </span>= jsonObject.getJSONArray("students"<span style="color: #000000">);
+
+    }</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<p><strong>示例2：JSON格式字符串与javaBean之间的转换。</strong></p>
+<p>首先，我们针对数据源所示的字符串，提供三个javaBean。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff">public</span> <span style="color: #0000ff">class</span><span style="color: #000000"> Student {
+
+    </span><span style="color: #0000ff">private</span><span style="color: #000000"> String studentName;
+    </span><span style="color: #0000ff">private</span><span style="color: #000000"> Integer studentAge;
+
+    </span><span style="color: #0000ff">public</span><span style="color: #000000"> String getStudentName() {
+        </span><span style="color: #0000ff">return</span><span style="color: #000000"> studentName;
+    }
+
+    </span><span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span><span style="color: #000000"> setStudentName(String studentName) {
+        </span><span style="color: #0000ff">this</span>.studentName =<span style="color: #000000"> studentName;
+    }
+
+    </span><span style="color: #0000ff">public</span><span style="color: #000000"> Integer getStudentAge() {
+        </span><span style="color: #0000ff">return</span><span style="color: #000000"> studentAge;
+    }
+
+    </span><span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span><span style="color: #000000"> setStudentAge(Integer studentAge) {
+        </span><span style="color: #0000ff">this</span>.studentAge =<span style="color: #000000"> studentAge;
+    }
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff">public</span> <span style="color: #0000ff">class</span><span style="color: #000000"> Course {
+
+    </span><span style="color: #0000ff">private</span><span style="color: #000000"> String courseName;
+    </span><span style="color: #0000ff">private</span><span style="color: #000000"> Integer code;
+
+    </span><span style="color: #0000ff">public</span><span style="color: #000000"> String getCourseName() {
+        </span><span style="color: #0000ff">return</span><span style="color: #000000"> courseName;
+    }
+
+    </span><span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span><span style="color: #000000"> setCourseName(String courseName) {
+        </span><span style="color: #0000ff">this</span>.courseName =<span style="color: #000000"> courseName;
+    }
+
+    </span><span style="color: #0000ff">public</span><span style="color: #000000"> Integer getCode() {
+        </span><span style="color: #0000ff">return</span><span style="color: #000000"> code;
+    }
+
+    </span><span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span><span style="color: #000000"> setCode(Integer code) {
+        </span><span style="color: #0000ff">this</span>.code =<span style="color: #000000"> code;
+    }
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff">public</span> <span style="color: #0000ff">class</span><span style="color: #000000"> Teacher {
+
+    </span><span style="color: #0000ff">private</span><span style="color: #000000"> String teacherName;
+    </span><span style="color: #0000ff">private</span><span style="color: #000000"> Integer teacherAge;
+    </span><span style="color: #0000ff">private</span><span style="color: #000000"> Course course;
+    </span><span style="color: #0000ff">private</span> List&lt;Student&gt;<span style="color: #000000"> students;
+
+    </span><span style="color: #0000ff">public</span><span style="color: #000000"> String getTeacherName() {
+        </span><span style="color: #0000ff">return</span><span style="color: #000000"> teacherName;
+    }
+
+    </span><span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span><span style="color: #000000"> setTeacherName(String teacherName) {
+        </span><span style="color: #0000ff">this</span>.teacherName =<span style="color: #000000"> teacherName;
+    }
+
+    </span><span style="color: #0000ff">public</span><span style="color: #000000"> Integer getTeacherAge() {
+        </span><span style="color: #0000ff">return</span><span style="color: #000000"> teacherAge;
+    }
+
+    </span><span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span><span style="color: #000000"> setTeacherAge(Integer teacherAge) {
+        </span><span style="color: #0000ff">this</span>.teacherAge =<span style="color: #000000"> teacherAge;
+    }
+
+    </span><span style="color: #0000ff">public</span><span style="color: #000000"> Course getCourse() {
+        </span><span style="color: #0000ff">return</span><span style="color: #000000"> course;
+    }
+
+    </span><span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span><span style="color: #000000"> setCourse(Course course) {
+        </span><span style="color: #0000ff">this</span>.course =<span style="color: #000000"> course;
+    }
+
+    </span><span style="color: #0000ff">public</span> List&lt;Student&gt;<span style="color: #000000"> getStudents() {
+        </span><span style="color: #0000ff">return</span><span style="color: #000000"> students;
+    }
+
+    </span><span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span> setStudents(List&lt;Student&gt;<span style="color: #000000"> students) {
+        </span><span style="color: #0000ff">this</span>.students =<span style="color: #000000"> students;
+    }
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>json字符串与javaBean之间的转换推荐使用&nbsp;TypeReference&lt;T&gt; 这个类，使用泛型可以更加清晰，当然也有其它的转换方式，这里就不做探讨了。</p>
+<p>示例2.1-json字符串-简单对象型与javaBean之间的转换</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #008000">   /**</span><span style="color: #008000">
+     * json字符串-简单对象与JavaBean_obj之间的转换
+     </span><span style="color: #008000">*/</span>
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span><span style="color: #000000"> testJSONStrToJavaBeanObj(){
+
+        Student student </span>= JSON.parseObject(JSON_OBJ_STR, <span style="color: #0000ff">new</span> TypeReference&lt;Student&gt;<span style="color: #000000">() {});
+        </span><span style="color: #008000">//</span><span style="color: #008000">Student student1 = JSONObject.parseObject(JSON_OBJ_STR, new TypeReference&lt;Student&gt;() {});</span><span style="color: #008000">//</span><span style="color: #008000">因为JSONObject继承了JSON，所以这样也是可以的</span>
+<span style="color: #000000">
+        System.out.println(student.getStudentName()</span>+":"+<span style="color: #000000">student.getStudentAge());
+
+    }</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>示例2.2-json字符串-数组类型与javaBean之间的转换</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #008000">/**</span><span style="color: #008000">
+     * json字符串-数组类型与JavaBean_List之间的转换
+     </span><span style="color: #008000">*/</span>
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span><span style="color: #000000"> testJSONStrToJavaBeanList(){
+        
+        ArrayList</span>&lt;Student&gt; students = JSON.parseObject(JSON_ARRAY_STR, <span style="color: #0000ff">new</span> TypeReference&lt;ArrayList&lt;Student&gt;&gt;<span style="color: #000000">() {});
+        </span><span style="color: #008000">//</span><span style="color: #008000">ArrayList&lt;Student&gt; students1 = JSONArray.parseObject(JSON_ARRAY_STR, new TypeReference&lt;ArrayList&lt;Student&gt;&gt;() {});</span><span style="color: #008000">//</span><span style="color: #008000">因为JSONArray继承了JSON，所以这样也是可以的</span>
+        
+        <span style="color: #0000ff">for</span><span style="color: #000000"> (Student student : students) {
+            System.out.println(student.getStudentName()</span>+":"+<span style="color: #000000">student.getStudentAge());
+        }
+    }</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>示例2.3-复杂json格式字符串与与javaBean之间的转换</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #008000">    /**</span><span style="color: #008000">
+     * 复杂json格式字符串与JavaBean_obj之间的转换
+     </span><span style="color: #008000">*/</span>
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span><span style="color: #000000"> testComplexJSONStrToJavaBean(){
+
+        Teacher teacher </span>= JSON.parseObject(COMPLEX_JSON_STR, <span style="color: #0000ff">new</span> TypeReference&lt;Teacher&gt;<span style="color: #000000">() {});
+        </span><span style="color: #008000">//</span><span style="color: #008000">Teacher teacher1 = JSON.parseObject(COMPLEX_JSON_STR, new TypeReference&lt;Teacher&gt;() {});</span><span style="color: #008000">//</span><span style="color: #008000">因为JSONObject继承了JSON，所以这样也是可以的</span>
+        String teacherName =<span style="color: #000000"> teacher.getTeacherName();
+        Integer teacherAge </span>=<span style="color: #000000"> teacher.getTeacherAge();
+        Course course </span>=<span style="color: #000000"> teacher.getCourse();
+        List</span>&lt;Student&gt; students =<span style="color: #000000"> teacher.getStudents();
+    }</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>对于TypeReference&lt;T&gt;，由于其构造方法使用 protected 进行修饰，所以在其他包下创建其对象的时候，要用其实现类的子类：new TypeReference&lt;Teacher&gt;() {}</p>
+<p><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/1014108-20170702143136649-1332485400.png" alt=""></p>
+<p>此外的：</p>
+<p>1，对于JSON对象与JSON格式字符串的转换可以直接用&nbsp;toJSONString()这个方法。</p>
+<p>2，javaBean与JSON格式字符串之间的转换要用到：JSON.toJSONString(obj);</p>
+<p>3，javaBean与json对象间的转换使用：JSON.toJSON(obj)，然后使用强制类型转换，JSONObject或者JSONArray。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;<strong>最后说一点，我们作为程序员，研究问题还是要仔细深入一点的。当你对原理
+了解的有够透彻，开发起来也就得心应手了，很多开发中的问题和疑惑也就迎刃而解了，而且在面对其他问题的时候也可做到触类旁通。当然在开发中没有太多的时
+间让你去研究原理，开发中要以实现功能为前提，可等项目上线的后，你有大把的时间或者空余的时间，你大可去刨根问底，深入的去研究一项技术，为觉得这对一
+名程序员的成长是很重要的事情。</strong></p></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory">分类: <a href="https://www.cnblogs.com/cdf-opensource-007/category/945189.html" target="_blank">JSON</a></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info"><div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(7106018,cb_blogId,1);green_channel_success(this,'谢谢推荐！');">好文要顶</a>
+            <a id="green_channel_follow" onclick="follow('46a01bb0-b869-e611-9fc1-ac853d9f53cc');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/cdf-opensource-007/" target="_blank"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/20180103144811.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="http://home.cnblogs.com/u/cdf-opensource-007/">你是风儿</a><br>
+            <a href="http://home.cnblogs.com/u/cdf-opensource-007/followees">关注 - 2</a><br>
+            <a href="http://home.cnblogs.com/u/cdf-opensource-007/followers">粉丝 - 40</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow('46a01bb0-b869-e611-9fc1-ac853d9f53cc');return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(7106018,'Digg')">
+        <span class="diggnum" id="digg_count">12</span>
+    </div>
+    <div class="buryit" onclick="votePost(7106018,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+<div class="clear"></div>
+<div id="post_next_prev"><a href="https://www.cnblogs.com/cdf-opensource-007/p/6603005.html" class="p_n_p_prefix">« </a> 上一篇：<a href="https://www.cnblogs.com/cdf-opensource-007/p/6603005.html" title="发布于2017-04-04 12:56">快速排序算法</a><br><a href="https://www.cnblogs.com/cdf-opensource-007/p/8068575.html" class="p_n_p_prefix">» </a> 下一篇：<a href="https://www.cnblogs.com/cdf-opensource-007/p/8068575.html" title="发布于2017-12-20 01:23">mysql数据库插入数据获取自增主键的三种方式（jdbc PreparedStatement方式、mybatis useGeneratedKeys方式、mybatis selectKey方式）</a><br></div>
+</div>
+
+
+		</div>
+		<div class="postDesc">posted @ <span id="post-date">2017-07-02 14:42</span> <a href="https://www.cnblogs.com/cdf-opensource-007/">你是风儿</a> 阅读(<span id="post_view_count">143296</span>) 评论(<span id="post_comment_count">6</span>)  <a href="https://i.cnblogs.com/EditPosts.aspx?postid=7106018" rel="nofollow">编辑</a> <a href="#" onclick="AddToWz(7106018);return false;">收藏</a></div>
+	</div>
+	<script type="text/javascript">var allowComments=true,cb_blogId=328268,cb_entryId=7106018,cb_blogApp=currentBlogApp,cb_blogUserGuid='46a01bb0-b869-e611-9fc1-ac853d9f53cc',cb_entryCreatedDate='2017/7/2 14:42:00';loadViewCount(cb_entryId);var cb_postType=1;</script>
+	
+</div><!--end: topics 文章、评论容器-->
+</div><a name="!comments"></a><div id="blog-comments-placeholder"><div id="comments_pager_top"></div>
+<br>
+<div class="feedback_area_title">评论列表</div>
+<div class="feedbackNoItems"></div>	
+
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="#3843908" class="layer">#1楼</a><a name="3843908" id="comment_anchor_3843908"></a>  <span class="comment_date">2017-11-18 14:59</span> <a id="a_comment_author_3843908" href="https://www.cnblogs.com/esileme/" target="_blank">esileme</a> <a href="http://msg.cnblogs.com/send/esileme" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_3843908" class="blog_comment_body">可以可以，很不错~</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3843908,'Digg',this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3843908,'Bury',this)">反对(0)</a></div><span id="comment_3843908_avatar" style="display:none;">http://pic.cnblogs.com/face/1220001/20170901234728.png</span>
+			</div>
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="#3868304" class="layer">#2楼</a><a name="3868304" id="comment_anchor_3868304"></a>  <span class="comment_date">2017-12-18 13:58</span> <a id="a_comment_author_3868304" href="http://home.cnblogs.com/u/1204838/" target="_blank">回眸一下</a> <a href="http://msg.cnblogs.com/send/%E5%9B%9E%E7%9C%B8%E4%B8%80%E4%B8%8B" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_3868304" class="blog_comment_body">nice啊</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3868304,'Digg',this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3868304,'Bury',this)">反对(0)</a></div>
+			</div>
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="#3869658" class="layer">#3楼</a><a name="3869658" id="comment_anchor_3869658"></a>[<span class="louzhu">楼主</span>]  <span class="comment_date">2017-12-19 20:21</span> <a id="a_comment_author_3869658" href="https://www.cnblogs.com/cdf-opensource-007/" target="_blank">你是风儿</a> <a href="http://msg.cnblogs.com/send/%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_3869658" class="blog_comment_body"><a href="#3868304" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,3868304);">@</a>
+回眸一下<br>多谢</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3869658,'Digg',this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3869658,'Bury',this)">反对(0)</a></div><span id="comment_3869658_avatar" style="display:none;">http://pic.cnblogs.com/face/1014108/20180103144811.png</span>
+			</div>
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="#3869659" class="layer">#4楼</a><a name="3869659" id="comment_anchor_3869659"></a>[<span class="louzhu">楼主</span>]  <span class="comment_date">2017-12-19 20:22</span> <a id="a_comment_author_3869659" href="https://www.cnblogs.com/cdf-opensource-007/" target="_blank">你是风儿</a> <a href="http://msg.cnblogs.com/send/%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_3869659" class="blog_comment_body"><a href="#3843908" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,3843908);">@</a>
+esileme<br>多多指教</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3869659,'Digg',this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3869659,'Bury',this)">反对(0)</a></div><span id="comment_3869659_avatar" style="display:none;">http://pic.cnblogs.com/face/1014108/20180103144811.png</span>
+			</div>
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="#3985821" class="layer">#5楼</a><a name="3985821" id="comment_anchor_3985821"></a>  <span class="comment_date">2018-05-29 16:37</span> <a id="a_comment_author_3985821" href="https://www.cnblogs.com/wangxinjian/" target="_blank">山中小楼夜听雨</a> <a href="http://msg.cnblogs.com/send/%E5%B1%B1%E4%B8%AD%E5%B0%8F%E6%A5%BC%E5%A4%9C%E5%90%AC%E9%9B%A8" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_3985821" class="blog_comment_body">多谢楼主</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3985821,'Digg',this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3985821,'Bury',this)">反对(0)</a></div>
+			</div>
+		</div>
+	
+		<div class="feedbackItem">
+			<div class="feedbackListSubtitle">
+				<div class="feedbackManage">
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</div>
+				<a href="#4043172" class="layer">#6楼</a><a name="4043172" id="comment_anchor_4043172"></a><span id="comment-maxId" style="display:none;">4043172</span><span id="comment-maxDate" style="display:none;">2018/8/15 9:10:07</span>  <span class="comment_date">2018-08-15 09:10</span> <a id="a_comment_author_4043172" href="https://www.cnblogs.com/breadman/" target="_blank">云中鵟</a> <a href="http://msg.cnblogs.com/send/%E4%BA%91%E4%B8%AD%E9%B5%9F" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+			</div>
+			<div class="feedbackCon">
+				<div id="comment_body_4043172" class="blog_comment_body">很赞同楼主结尾的话！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4043172,'Digg',this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(4043172,'Bury',this)">反对(0)</a></div><span id="comment_4043172_avatar" style="display:none;">http://pic.cnblogs.com/face/989285/20161129153822.png</span>
+			</div>
+		</div>
+	<div id="comments_pager_bottom"></div></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id="comment_form" class="commentform">
+<a name="commentform"></a>
+<div id="divCommentShow"></div>
+<div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a></div>
+<div id="comment_form_container"><div class="login_tips">注册用户登录后才能发表评论，请 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login('commentform');">登录</a> 或 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，<a href="http://www.cnblogs.com/">访问</a>网站首页。</div></div>
+<div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+<div id="ad_t2"><a href="http://www.ucancode.com/index.htm" target="_blank">【推荐】超50万VC++源码: 大型组态工控、电力仿真CAD与GIS源码库！</a><br><a href="https://cloud.tencent.com/act/domainsales?fromSource=gwzcw.1351351.1351351.1351351" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-域名')">【推荐】腾讯云新注册用户域名抢购1元起</a><br></div>
+<div id="opt_under_post"></div>
+<div id="cnblogs_c1" class="c_ad_block"><a href="https://cloud.tencent.com/act/special/amd?fromSource=gwzcw.1351353.1351353.1351353" target="_blank"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/24442-20181008121639348-1607410764.jpg" alt="腾讯云1008" onclick="ga('send', 'event', 'Link', 'click', 'C1');" width="300" height="250"></a></div>
+<div id="under_post_news"><div class="itnews c_ad_block"><b>最新IT新闻</b>:<br> ·  <a href="https://news.cnblogs.com/n/609234/" target="_blank">腾讯控股：耗资3900万港元回购13.4万股股票</a><br> ·  <a href="https://news.cnblogs.com/n/609233/" target="_blank">沃尔沃下代全部车型将搭载英伟达AI计算机 实现初级自动驾驶</a><br> ·  <a href="https://news.cnblogs.com/n/609232/" target="_blank">美国和欧盟对Google+泄露用户信息事件展开调查</a><br> ·  <a href="https://news.cnblogs.com/n/609231/" target="_blank">贾跃亭回应减持2202万股乐视网：法院未通知直接处置还债</a><br> ·  <a href="https://news.cnblogs.com/n/609230/" target="_blank">研究称人类平均可识别5000张面孔 能力远超实用范围</a><br>» <a href="http://news.cnblogs.com/" title="IT新闻" target="_blank">更多新闻...</a></div></div>
+<script async="async" src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/gpt.js"></script>
+<script>
+  var googletag = googletag || {};
+  googletag.cmd = googletag.cmd || [];
+</script>
+
+<script>
+  googletag.cmd.push(function() {
+    googletag.defineSlot('/1090369/C2', [468, 60], 'div-gpt-ad-1539008685004-0').addService(googletag.pubads());
+    googletag.pubads().enableSingleRequest();
+    googletag.enableServices();
+  });
+</script>
+<div id="cnblogs_c2" class="c_ad_block"><a href="http://clickc.admaster.com.cn/c/a113319,b2799157,c1705,i0,m101,8a1,8b3,h" target="_blank"><img src="FastJson%E5%AF%B9%E4%BA%8EJSON%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E3%80%81JSON%E5%AF%B9%E8%B1%A1%E5%8F%8AJavaBean%E4%B9%8B%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2%20-%20%E4%BD%A0%E6%98%AF%E9%A3%8E%E5%84%BF%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/24442-20180916205959082-1265433055.jpg" alt="华为云HC0917" onclick="ga('send', 'event', 'Link', 'click', 'C2');" width="468" height="60"></a></div>
+<div id="under_post_kb"><div class="itnews c_ad_block" id="kb_block"><b>最新知识库文章</b>:<br><div id="kb_recent"> ·  <a href="https://kb.cnblogs.com/page/606682/" target="_blank">为什么说 Java 程序员必须掌握 Spring Boot ？</a><br> ·  <a href="https://kb.cnblogs.com/page/606645/" target="_blank">在学习中，有一个比掌握知识更重要的能力</a><br> ·  <a href="https://kb.cnblogs.com/page/603663/" target="_blank">如何招到一个靠谱的程序员</a><br> ·  <a href="https://kb.cnblogs.com/page/573614/" target="_blank">一个故事看懂“区块链”</a><br> ·  <a href="https://kb.cnblogs.com/page/603697/" target="_blank">被踢出去的用户</a><br></div>» <a href="https://kb.cnblogs.com/" target="_blank">更多知识库文章...</a></div></div>
+<div id="HistoryToday" class="c_ad_block"></div>
+<script type="text/javascript">
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<!--done-->
+<div class="newsItem">
+<h3 class="catListTitle">公告</h3>
+	<div id="blog-news"><div id="profile_block">昵称：<a href="https://home.cnblogs.com/u/cdf-opensource-007/">你是风儿</a><br>园龄：<a href="https://home.cnblogs.com/u/cdf-opensource-007/" title="入园时间：2016-08-24">2年1个月</a><br>粉丝：<a href="https://home.cnblogs.com/u/cdf-opensource-007/followers/">40</a><br>关注：<a href="https://home.cnblogs.com/u/cdf-opensource-007/followees/">2</a><div id="p_b_follow"><a href="javascript:void(0);" onclick="follow('46a01bb0-b869-e611-9fc1-ac853d9f53cc')">+加关注</a></div><script>getFollowStatus('46a01bb0-b869-e611-9fc1-ac853d9f53cc')</script></div></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+
+			<div id="blog-calendar" style=""><table id="blogCalendar" class="Cal" title="Calendar" cellspacing="0" cellpadding="0">
+	<tbody><tr><td colspan="7"><table class="CalTitle" cellspacing="0">
+		<tbody><tr><td class="CalNextPrev"><a href="javascript:void(0);" onclick="loadBlogCalendar('2018/09/01');return false;">&lt;</a></td><td align="center">2018年10月</td><td class="CalNextPrev" align="right"><a href="javascript:void(0);" onclick="loadBlogCalendar('2018/11/01');return false;">&gt;</a></td></tr>
+	</tbody></table></td></tr><tr><th class="CalDayHeader" abbr="日" scope="col" align="center">日</th><th class="CalDayHeader" abbr="一" scope="col" align="center">一</th><th class="CalDayHeader" abbr="二" scope="col" align="center">二</th><th class="CalDayHeader" abbr="三" scope="col" align="center">三</th><th class="CalDayHeader" abbr="四" scope="col" align="center">四</th><th class="CalDayHeader" abbr="五" scope="col" align="center">五</th><th class="CalDayHeader" abbr="六" scope="col" align="center">六</th></tr><tr><td class="CalOtherMonthDay" align="center">30</td><td align="center">1</td><td align="center">2</td><td align="center">3</td><td align="center">4</td><td align="center">5</td><td class="CalWeekendDay" align="center">6</td></tr><tr><td class="CalWeekendDay" align="center">7</td><td align="center">8</td><td align="center">9</td><td class="CalTodayDay" align="center">10</td><td align="center">11</td><td align="center">12</td><td class="CalWeekendDay" align="center">13</td></tr><tr><td class="CalWeekendDay" align="center">14</td><td align="center">15</td><td align="center">16</td><td align="center">17</td><td align="center">18</td><td align="center">19</td><td class="CalWeekendDay" align="center">20</td></tr><tr><td class="CalWeekendDay" align="center">21</td><td align="center">22</td><td align="center">23</td><td align="center">24</td><td align="center">25</td><td align="center">26</td><td class="CalWeekendDay" align="center">27</td></tr><tr><td class="CalWeekendDay" align="center">28</td><td align="center">29</td><td align="center">30</td><td align="center">31</td><td class="CalOtherMonthDay" align="center">1</td><td class="CalOtherMonthDay" align="center">2</td><td class="CalOtherMonthDay" align="center">3</td></tr><tr><td class="CalOtherMonthDay" align="center">4</td><td class="CalOtherMonthDay" align="center">5</td><td class="CalOtherMonthDay" align="center">6</td><td class="CalOtherMonthDay" align="center">7</td><td class="CalOtherMonthDay" align="center">8</td><td class="CalOtherMonthDay" align="center">9</td><td class="CalOtherMonthDay" align="center">10</td></tr>
+</tbody></table></div><script type="text/javascript">loadBlogDefaultCalendar();</script>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"><div id="sidebar_search" class="sidebar-block">
+<div id="sidebar_search" class="mySearch">
+<h3 class="catListTitle">搜索</h3>
+<div id="sidebar_search_box">
+<div id="widget_my_zzk" class="div_my_zzk"><input id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk" type="text">&nbsp;<input onclick="zzk_go()" value="找找看" id="btnZzk" class="btn_my_zzk" type="button"></div>
+<div id="widget_my_google" class="div_my_zzk"><input name="google_q" id="google_q" onkeydown="return google_go_enter(event)" class="input_my_zzk" type="text">&nbsp;<input onclick="google_go()" value="谷歌搜索" class="btn_my_zzk" type="button"></div>
+</div>
+</div>
+
+</div><div id="sidebar_shortcut" class="sidebar-block">
+<div class="catListLink">
+<h3 class="catListTitle">常用链接</h3>
+<ul>
+<li><a href="https://www.cnblogs.com/cdf-opensource-007/p/" title="我的博客的随笔列表">我的随笔</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/MyComments.html" title="我发表过的评论列表">我的评论</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/RecentComments.html" title="我的博客的评论列表">最新评论</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/tag/" title="我的博客的标签列表">我的标签</a></li>
+</ul>
+<div id="itemListLin_con" style="display:none;">
+<ul>
+
+</ul>
+</div>
+</div></div><div id="sidebar_toptags" class="sidebar-block">
+<div class="catListTag">
+<h3 class="catListTitle">我的标签</h3>
+<ul>
+<li><a href="https://www.cnblogs.com/cdf-opensource-007/tag/BeanUtils/">BeanUtils</a>(1)</li><li><a href="https://www.cnblogs.com/cdf-opensource-007/tag/HttpServletRequest/">HttpServletRequest</a>(1)</li>
+</ul>
+</div></div><div id="sidebar_categories">
+<div id="sidebar_postcategory" class="catListPostCategory sidebar-block">
+<h3 class="catListTitle">随笔分类</h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_0_Link_0" href="https://www.cnblogs.com/cdf-opensource-007/category/943311.html">Ajax(4)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_1" href="https://www.cnblogs.com/cdf-opensource-007/category/945189.html">JSON(6)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_2" href="https://www.cnblogs.com/cdf-opensource-007/category/958720.html">mysql(5)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_3" href="https://www.cnblogs.com/cdf-opensource-007/category/950274.html">spring(9)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_4" href="https://www.cnblogs.com/cdf-opensource-007/category/1195917.html">多线程(1)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_5" href="https://www.cnblogs.com/cdf-opensource-007/category/944169.html">其它(2)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_6" href="https://www.cnblogs.com/cdf-opensource-007/category/944167.html">前端技术(1)</a> </li>
+
+<li><a id="CatList_LinkList_0_Link_7" href="https://www.cnblogs.com/cdf-opensource-007/category/969550.html">数据结构和算法(1)</a> </li>
+
+</ul>
+
+</div>
+
+<div id="sidebar_postarchive" class="catListPostArchive sidebar-block">
+<h3 class="catListTitle">随笔档案</h3>
+
+<ul>
+
+<li><a id="CatList_LinkList_1_Link_0" href="https://www.cnblogs.com/cdf-opensource-007/archive/2018/04.html">2018年4月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_1" href="https://www.cnblogs.com/cdf-opensource-007/archive/2017/12.html">2017年12月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_2" href="https://www.cnblogs.com/cdf-opensource-007/archive/2017/07.html">2017年7月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_3" href="https://www.cnblogs.com/cdf-opensource-007/archive/2017/04.html">2017年4月 (1)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_4" href="https://www.cnblogs.com/cdf-opensource-007/archive/2017/03.html">2017年3月 (5)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_5" href="https://www.cnblogs.com/cdf-opensource-007/archive/2017/02.html">2017年2月 (15)</a> </li>
+
+<li><a id="CatList_LinkList_1_Link_6" href="https://www.cnblogs.com/cdf-opensource-007/archive/2017/01.html">2017年1月 (5)</a> </li>
+
+</ul>
+
+</div>
+
+</div><div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap">
+<div class="catListComment">
+<h3 class="catListTitle">最新评论</h3>
+
+	<div id="RecentCommentsBlock"><ul>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/cdf-opensource-007/p/6540521.html#4084050">1. Re:mysql（4）——   表连接查询与where后使用子查询的性能分析。</a></li>
+        <li class="recent_comment_body">@冬瓜丶瓜瓜瓜,帖子的案例不具有参考性,仅从两行表的固定SQL对比时间,太片面了,假如关联了7张表,每张表的数据都在10w+,显然关联查询是不可取的,此时应该使用子查询...</li>
+        <li class="recent_comment_author">--行舟水上_温酒听雨</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/cdf-opensource-007/p/7106018.html#4043172">2. Re:FastJson对于JSON格式字符串、JSON对象及JavaBean之间的相互转换</a></li>
+        <li class="recent_comment_body">很赞同楼主结尾的话！</li>
+        <li class="recent_comment_author">--云中鵟</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/cdf-opensource-007/p/7106018.html#3985821">3. Re:FastJson对于JSON格式字符串、JSON对象及JavaBean之间的相互转换</a></li>
+        <li class="recent_comment_body">多谢楼主</li>
+        <li class="recent_comment_author">--山中小楼夜听雨</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/cdf-opensource-007/p/6502556.html#3982750">4. Re:mysql（1）—— 详解一条sql语句的执行过程</a></li>
+        <li class="recent_comment_body">@五月风多谢！...</li>
+        <li class="recent_comment_author">--你是风儿</li>
+        <li class="recent_comment_title"><a href="https://www.cnblogs.com/cdf-opensource-007/p/6502556.html#3982748">5. Re:mysql（1）—— 详解一条sql语句的执行过程</a></li>
+        <li class="recent_comment_body">@frankchao1005谢谢，一起加油！...</li>
+        <li class="recent_comment_author">--你是风儿</li>
+</ul>
+</div>
+</div>
+</div></div><div id="sidebar_topviewedposts" class="sidebar-block"><div id="topview_posts_wrap">
+<div class="catListView">
+<h3 class="catListTitle">阅读排行榜</h3>
+	<div id="TopViewPostsBlock"><ul><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/7106018.html">1. FastJson对于JSON格式字符串、JSON对象及JavaBean之间的相互转换(143285)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6371237.html">2. 详解Ajax请求（四）——多个异步请求的执行顺序(18917)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6384724.html">3. JSON（二）——JavaScript中js对象与JSON格式字符串的相互转换(14964)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6337448.html">4. 详解get请求和post请求参数中文乱码的解决办法(12871)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6287780.html">5. 使用getParameterMap()方法实现对请求参数的封装的工具类(8882)</a></li></ul></div>
+</div>
+</div></div><div id="sidebar_topcommentedposts" class="sidebar-block"><div id="topfeedback_posts_wrap">
+<div class="catListFeedback">
+<h3 class="catListTitle">评论排行榜</h3>
+	<div id="TopFeedbackPostsBlock"><ul><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/7106018.html">1. FastJson对于JSON格式字符串、JSON对象及JavaBean之间的相互转换(6)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6502556.html">2. mysql（1）—— 详解一条sql语句的执行过程(6)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6540521.html">3. mysql（4）——   表连接查询与where后使用子查询的性能分析。(3)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6371237.html">4. 详解Ajax请求（四）——多个异步请求的执行顺序(1)</a></li></ul></div>
+</div>
+</div></div><div id="sidebar_topdiggedposts" class="sidebar-block"><div id="topdigg_posts_wrap">
+<div class="catListView">
+<h3 class="catListTitle">推荐排行榜</h3>
+<div id="TopDiggPostsBlock"><ul><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/7106018.html">1. FastJson对于JSON格式字符串、JSON对象及JavaBean之间的相互转换(12)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6540521.html">2. mysql（4）——   表连接查询与where后使用子查询的性能分析。(4)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6507678.html">3. mysql（2）—— 由笛卡尔积现象分析数据库表的连接(3)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6371237.html">4. 详解Ajax请求（四）——多个异步请求的执行顺序(3)</a></li><li><a href="https://www.cnblogs.com/cdf-opensource-007/p/6603005.html">5. 快速排序算法(2)</a></li></ul></div>
+</div></div></div></div><script type="text/javascript">loadBlogSideColumn();</script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		
+<!--done-->
+Copyright ©2018 你是风儿
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+</body></html>
