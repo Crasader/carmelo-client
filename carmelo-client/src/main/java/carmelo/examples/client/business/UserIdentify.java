@@ -13,12 +13,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 
 import carmelo.common.LoginState;
+import carmelo.common.SpringContext;
 import carmelo.common.UserConfiguration;
 import carmelo.examples.client.sync.FutureManager;
 import carmelo.examples.client.sync.RequestId;
 import carmelo.examples.client.sync.SyncFuture;
+import carmelo.json.MessageType;
 import carmelo.json.ResponseDto;
 import carmelo.json.ResponseType;
+import carmelo.servlet.OutputMessage;
 import carmelo.servlet.Request;
 import carmelo.servlet.Response;
 import io.netty.channel.ChannelHandlerContext;
@@ -67,9 +70,10 @@ public class UserIdentify {
 		requestId = RequestId.get();
 		Request request = new Request(requestId, "user!login", params, "0", ctx);
 		//创建并添加future
-		SyncFuture<Response> future = FutureManager.getInstance().createFuture(requestId);
+		FutureManager fm = (FutureManager)SpringContext.getBean(FutureManager.class);
+		SyncFuture<Response> future = fm.createFuture(requestId);
 		//发送请求
-		ctx.write(request);
+		ctx.write(new OutputMessage(MessageType.REQUEST, request));
 		ctx.flush();
 		//同步等待返回结果
 		Response response = future.get(3000, TimeUnit.MILLISECONDS);
@@ -103,6 +107,7 @@ public class UserIdentify {
 			String sessionId = jsonObject.getString("sessionId");//获取到sessionId,暂时不做什么处理
 			LoginState.setSessionId(sessionId);
 			LoginState.setLoginState(true);//设置全局登录成功
+			LoginState.setCtx(ctx);
 			System.out.println("登录成功，sessionId:" + sessionId);
 			return;
 		}else {
@@ -121,9 +126,10 @@ public class UserIdentify {
 		Request request = new Request(requestId, "user!apply", "", "0", ctx);
 
 		//创建并添加一个future
-		SyncFuture<Response> future = FutureManager.getInstance().createFuture(requestId);
+		FutureManager fm = (FutureManager)SpringContext.getBean(FutureManager.class);
+		SyncFuture<Response> future = fm.createFuture(requestId);
 		//发送请求
-		ctx.write(request);
+		ctx.write(new OutputMessage(MessageType.REQUEST, request));
 		ctx.flush();
 		//同步等待结果
 		Response response = future.get(3000, TimeUnit.MILLISECONDS);
@@ -148,6 +154,7 @@ public class UserIdentify {
 			String password = jsonObject.getString("password");//获取密码
 			LoginState.setSessionId(sessionId);//保存sessionId
 			LoginState.setLoginState(true);//设置全局登录成功
+			LoginState.setCtx(ctx);
 			UserConfiguration.setProp("name", name);//保存用户名
 			UserConfiguration.setProp("password", password);//保存用户密码
 			System.out.println("申请注册并登录成功，sessionId:" + sessionId);

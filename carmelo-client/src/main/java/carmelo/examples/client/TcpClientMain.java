@@ -20,12 +20,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import carmelo.common.Configuration;
-import carmelo.common.SpringContextHolder;
+import carmelo.common.SpringContext;
 import carmelo.examples.client.business.UserIdentify;
 import carmelo.examples.handler.TcpClientDecoder;
 import carmelo.examples.handler.TcpClientEncoder;
 import carmelo.examples.handler.TcpClientHandler;
 import carmelo.servlet.Request;
+import carmelo.servlet.Servlet;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -52,6 +53,7 @@ public class TcpClientMain extends Thread{
 	private static int firstMessageSize;
 	private static ChannelHandlerContext ctx;
 	private static TcpClientMain client;
+	private static Servlet servlet;
 	private Channel channel;
 	//latch用于主线程同步等待建立连接
 	private static CountDownLatch latch = new CountDownLatch(1);
@@ -64,6 +66,8 @@ public class TcpClientMain extends Thread{
 		TcpClientMain.host = host;
 		TcpClientMain.port = port;
 		TcpClientMain.firstMessageSize = firstMessageSize;
+		TcpClientMain.servlet = new Servlet();
+		servlet.init();//扫描Action业务方法
 	}
 
 	public Channel connect(String host, int port) {
@@ -128,7 +132,7 @@ public class TcpClientMain extends Thread{
 			return;
 		}
 //		System.out.println("主线程：" + Thread.currentThread().getName());
-		UserIdentify identifier = (UserIdentify)SpringContextHolder.getBean(UserIdentify.class);
+		UserIdentify identifier = (UserIdentify)SpringContext.getBean(UserIdentify.class);
 		identifier.login(ctx);
 
 		//输入命令执行相应操作
@@ -187,6 +191,10 @@ public class TcpClientMain extends Thread{
 
 	public static int getFirstMessageSize() {
 		return firstMessageSize;
+	}
+	
+	public static Servlet getServlet() {
+		return servlet;
 	}
 
 	public Channel getChannel() {
