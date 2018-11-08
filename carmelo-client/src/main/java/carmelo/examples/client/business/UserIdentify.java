@@ -1,16 +1,15 @@
 package carmelo.examples.client.business;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 
 import carmelo.common.LoginState;
 import carmelo.common.SpringContext;
@@ -55,7 +54,7 @@ public class UserIdentify {
 
 	//登录服务器
 	@Async//异步执行
-	public void login(ChannelHandlerContext ctx) throws InterruptedException, ExecutionException, TimeoutException {
+	public void login(ChannelHandlerContext ctx) throws InterruptedException, ExecutionException, TimeoutException, IOException {
 //		System.out.println("登录线程：" + Thread.currentThread().getName());
 		this.setChannelContext(ctx);
 		String name = UserConfiguration.getProp("name");
@@ -109,6 +108,7 @@ public class UserIdentify {
 			LoginState.setLoginState(true);//设置全局登录成功
 			LoginState.setCtx(ctx);
 			System.out.println("登录成功，sessionId:" + sessionId);
+			DeviceBusiness.getOnline();//设备上线
 			return;
 		}else {
 			System.out.println("未知错误，登录失败,请联系开发人员");
@@ -118,7 +118,7 @@ public class UserIdentify {
 
 	//向服务器申请注册新用户
 	@Async
-	public void apply(ChannelHandlerContext ctx) throws InterruptedException, ExecutionException, TimeoutException {
+	public void apply(ChannelHandlerContext ctx) throws InterruptedException, ExecutionException, TimeoutException, IOException {
 		this.setChannelContext(ctx);
 		//获取一个请求id
 		int requestId = RequestId.get();
@@ -158,6 +158,7 @@ public class UserIdentify {
 			UserConfiguration.setProp("name", name);//保存用户名
 			UserConfiguration.setProp("password", password);//保存用户密码
 			System.out.println("申请注册并登录成功，sessionId:" + sessionId);
+			DeviceBusiness.getOnline();//设备上线
 			return;
 		}else {
 			System.out.println("未知错误，申请注册失败，请联系开发人员");

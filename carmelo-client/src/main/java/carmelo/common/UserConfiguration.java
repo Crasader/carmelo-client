@@ -20,7 +20,8 @@ public class UserConfiguration {
 	
 	static {
 		String classpath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-        fileName = classpath + "user.properties";
+//        fileName = classpath + "user.properties";
+        fileName = "/home/lgc/git/carmelo-client/carmelo-client/src/main/resources/" + "user.properties";
         userProp = new Properties();
         InputStream is;
 		try {
