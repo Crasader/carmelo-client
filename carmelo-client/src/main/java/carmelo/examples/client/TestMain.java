@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,23 +19,35 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import carmelo.common.SpringContext;
 import carmelo.examples.client.device.DeviceConfig;
 import carmelo.examples.client.device.domain.BitPort;
 import carmelo.examples.client.device.domain.Composite;
 import carmelo.examples.client.device.domain.DeviceUtil;
+import carmelo.examples.client.environment.World;
 import carmelo.json.JsonBuilder;
 
 public class TestMain {
 
 	private static final Logger logger = LoggerFactory.getLogger(TestMain.class);
-	
+
 	public static void main(String[] args) throws Exception {
-//		System.out.println(builder.toString());
-		//下一步工作：客户端登录后，将本地配置解析成map,发服务端 ，服务端确认后返回成功或更新后的id map
-		//客户端更新id map并重新生成配置json文件在本地存储
-		logger.error("log test");
-		logger.info(DeviceConfig.getBitPortMap().toString());
 		
+
+		
+		//启动界面
+		int width = 600;
+		int heigth = 480;
+		JFrame frame = new JFrame("我的世界");
+		World world = (World)SpringContext.getBean(World.class);
+		world.setFrame(frame);
+		world.init(width, heigth);
+		frame.getContentPane().add(world);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(600 , 500 );
+		frame.setLocation(200, 100);
+		frame.setVisible(true);
+
 	}
 
 
@@ -96,11 +110,11 @@ public class TestMain {
 		}
 
 	}
-	
-	
+
+
 	//从配置文件读取device配置
 	public static void readDeviceConfiguration() throws Exception {
-		
+
 		Map<Integer, Composite> compositeMap = DeviceConfig.getCompositeMap();
 		System.out.println("\nComposite列表：");
 		for(Composite cp : compositeMap.values()) {
@@ -111,13 +125,13 @@ public class TestMain {
 				System.out.println("id: " + cf[1]);
 			}
 		}
-		
+
 		System.out.println("\n根Composite:");
 		int rootId = DeviceConfig.getRootId();
 		Composite rootComposite = compositeMap.get(rootId);
 		System.out.println(JSON.toJSONString(rootComposite));
-		
-		
+
+
 		Map<Integer, BitPort> bitportMap = DeviceConfig.getBitPortMap();
 		System.out.println("\nBitPort列表：");
 		for(BitPort bp : bitportMap.values()) {

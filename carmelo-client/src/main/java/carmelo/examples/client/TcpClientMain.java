@@ -19,9 +19,13 @@ import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import carmelo.common.Configuration;
 import carmelo.common.SpringContext;
 import carmelo.examples.client.business.UserIdentify;
+import carmelo.examples.client.environment.World;
 import carmelo.examples.handler.TcpClientDecoder;
 import carmelo.examples.handler.TcpClientEncoder;
 import carmelo.examples.handler.TcpClientHandler;
@@ -134,6 +138,18 @@ public class TcpClientMain extends Thread{
 //		System.out.println("主线程：" + Thread.currentThread().getName());
 		UserIdentify identifier = (UserIdentify)SpringContext.getBean(UserIdentify.class);
 		identifier.login(ctx);
+		
+		//启动界面
+		int width = 600;
+    	int heigth = 480;
+    	World world = (World)SpringContext.getBean(World.class);
+    	world.init(width, heigth);
+		JFrame frame = new JFrame("我的世界");
+		frame.getContentPane().add(world);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(600 , 480 );
+		frame.setLocation(200, 100);
+		frame.setVisible(true);
 
 		//输入命令执行相应操作
 		System.err.println("try typing in following actions and have fun!\nuser!login name=1&password=123\nuser!logout\nuser!reconnect sessionId=2\n");
